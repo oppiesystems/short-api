@@ -9,13 +9,11 @@ Reference:
 """
 
 import numpy as np
-from talon.signature.bruteforce import extract_signature
 from langdetect import detect
 from nltk.tokenize import sent_tokenize
 from skipthoughts.skipthoughts import Encoder, load_model
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
-
 
 def preprocess(strs):
     """
@@ -25,7 +23,6 @@ def preprocess(strs):
     n_strs = len(strs)
     for i in range(n_strs):
         str = strs[i]
-        str, _ = extract_signature(str)
         lines = str.split('\n')
         for j in reversed(range(len(lines))):
             lines[j] = lines[j].strip()

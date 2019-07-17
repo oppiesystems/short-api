@@ -2,14 +2,14 @@
 
 Text summarization product for distilling human verbosity.
 
-## Setup
+## Development
+
+### Development Prerequisites
 
 ```bash
 virtualenv .
 source bin/activate
 ```
-
-### Install
 
 ```bash
 pip install -r requirements.txt
@@ -27,8 +27,17 @@ mkdir models
 wget -P ./models http://www.cs.toronto.edu/~rkiros/models/dictionary.txt
 ```
 
-## Run
+### Run
 
 ```bash
 python main.py
+```
+
+### Test
+
+```bash
+curl --header "Content-Type: application/json" \
+  --request POST \
+  -d @test/data.json \
+  http://0.0.0.0:5900/api/shorten
 ```

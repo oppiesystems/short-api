@@ -3,7 +3,7 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
-from summarization import summarize
+from summarization import summarize, download_models
 
 load_dotenv()
 
@@ -34,6 +34,9 @@ def shorten():
 app.register_blueprint(api, url_prefix='/api')
 
 if __name__ == '__main__':
+  # Loads models into memory
+  download_models()
+
   # initialize the log handler
   logHandler = RotatingFileHandler(
     os.environ.get('ERRORS_LOG_PATH', 'errors.log'), 

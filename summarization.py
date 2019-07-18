@@ -11,9 +11,11 @@ Reference:
 import numpy as np
 from langdetect import detect
 from nltk.tokenize import sent_tokenize
-from skipthoughts.skipthoughts import Encoder, load_model
+from skipthoughts.skipthoughts import Encoder, load_model, path_to_tables, path_to_umodel, path_to_bmodel
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
+
+import util, os
 
 def preprocess(strs):
     """
@@ -108,4 +110,27 @@ def summarize(strs):
     print('Clustering Finished')
 
     return summaries
+
+
+def download_models():
+    """ Installs missing models dependencies, if they don't exist already. """
+    dependencies = [
+        path_to_umodel,
+        '%s.pkl' % path_to_umodel,
+        path_to_bmodel,
+        '%s.pkl' % path_to_bmodel,
+        '%sutable.npy' % path_to_tables,
+        '%sbtable.npy' % path_to_tables,
+        '%sdictionary.txt' % path_to_tables
+    ]
+
+    for i, filePath in enumerate(dependencies):
+        if (os.path.isfile(filePath) != True):
+            try:
+                print "Downloading: '%s'..." % filePath
+                util.download_blob('breef-models', filePath, filePath)
+            except Exception as e:
+                print e
+            
+
       

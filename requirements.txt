@@ -6,4 +6,5 @@ nltk==3.3
 scikit_learn==0.19.2
 scipy==0.16
 theano==1.0.4
+google-cloud-storage==1.16.1
 git+https://github.com/oppielabs/skipthoughts.git

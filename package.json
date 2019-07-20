@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "preinstall": "virtualenv . && source bin/activate && pip install -r requirements.txt && python -c 'import nltk; nltk.download(\"punkt\")'",
+    "build": "docker build -t breef:latest .",
+    "start": "docker-compose up"
+  }
+}

@@ -65,5 +65,6 @@ target/
 # Downloaded data files
 data/
 
-# Models
-models
+# Models (files only)
+models/*
+!models/.gitkeep

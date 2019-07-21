@@ -8,6 +8,8 @@ Reference:
     - https://medium.com/jatana/unsupervised-text-summarization-using-sentence-embeddings-adb15ce83db1
 """
 
+import util, os, logging
+
 import numpy as np
 from langdetect import detect
 from nltk.tokenize import sent_tokenize
@@ -15,7 +17,8 @@ from skipthoughts.skipthoughts import Encoder, load_model, path_to_tables, path_
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 
-import util, os
+MODEL_BUCKET = os.environ.get('MODEL_BUCKET', 'breef-models')
+_logger = logging.getLogger('summarization')
 
 def preprocess(strs):
     """
@@ -49,7 +52,7 @@ def split_sentences(strs):
         strs[i] = sentences
         
         
-def skipthought_encode(strs):
+def skipthought_encode(strs, model):
     """
     Obtains sentence embeddings for each sentence in the strings
     """
@@ -61,10 +64,8 @@ def skipthought_encode(strs):
         cum_sum_sentences.append(sent_count)
 
     all_sentences = [sent for str in strs for sent in str]
-    print('Loading pre-trained models...')
-    model = load_model()
     encoder = Encoder(model)
-    print('Encoding sentences...')
+    _logger.info('Encoding sentences...')
     enc_sentences = encoder.encode(all_sentences, verbose=False)
 
     for i in range(len(strs)):
@@ -74,22 +75,25 @@ def skipthought_encode(strs):
     return enc_strs
         
     
-def summarize(strs):
+def summarize(strs, model=None):
     """
     Performs summarization of strings
     """
+    if model == None:
+        model = load_models()
+
     n_strs = len(strs)
     summaries = [None]*n_strs
 
-    print('Preprocessing...')
+    _logger.info('Preprocessing...')
     preprocess(strs)
 
-    print('Splitting into sentences...')
+    _logger.info('Splitting into sentences...')
     split_sentences(strs)
 
-    print('Starting to encode...')
-    enc_strs = skipthought_encode(strs)
-    print('Encoding Finished')
+    _logger.info('Starting to encode...')
+    enc_strs = skipthought_encode(strs, model)
+    _logger.info('Encoding Finished')
 
     for i in range(n_strs):
         enc_str = enc_strs[i]
@@ -104,16 +108,18 @@ def summarize(strs):
             avg.append(np.mean(idx))
 
         closest, _ = pairwise_distances_argmin_min(kmeans.cluster_centers_,\
-                                                   enc_str)
+                                                enc_str)
         ordering = sorted(range(n_clusters), key=lambda k: avg[k])
         summaries[i] = ' '.join([strs[i][closest[idx]] for idx in ordering])
-    print('Clustering Finished')
+    _logger.info('Clustering Finished')
 
     return summaries
 
 
-def download_models():
-    """ Installs missing models dependencies, if they don't exist already. """
+def download_models(gs_bucket):
+    """ 
+    Downloads missing models dependencies, locally, if they don't exist already. 
+    """
     dependencies = [
         path_to_umodel,
         '%s.pkl' % path_to_umodel,
@@ -124,13 +130,22 @@ def download_models():
         '%sdictionary.txt' % path_to_tables
     ]
 
-    for i, filePath in enumerate(dependencies):
+    for _, filePath in enumerate(dependencies):
+        # Creates directory if it doesn't exist
+        directory = os.path.dirname(filePath)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        # Downloads dependency from Google Cloud Storage
         if (os.path.isfile(filePath) != True):
             try:
-                print "Downloading: '%s'..." % filePath
-                util.download_blob('breef-models', filePath, filePath)
+                _logger.info('Downloading: \'%s\'...' % filePath)
+                util.download_blob(gs_bucket, filePath, filePath)
             except Exception as e:
-                print e
-            
+                _logger.error(e)
 
-      
+def load_models():
+    download_models(MODEL_BUCKET)
+
+    _logger.info('Loading pre-trained models...')
+    return load_model()

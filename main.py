@@ -4,7 +4,7 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
-from summarization import download_models, load_models, summarize
+import summarization
 
 load_dotenv()
 
@@ -19,7 +19,7 @@ api = Blueprint('api', __name__, template_folder='templates')
 def _load_model():
   global MODEL
 
-  MODEL = load_models()
+  MODEL = summarization.load_models()
 
 @api.route('/shorten', methods=['GET', 'POST'])
 def shorten():
@@ -34,7 +34,7 @@ def shorten():
     return jsonify(status_code='400', msg='Bad Request'), 400
 
   try:
-    summaries = summarize(content, model=MODEL)
+    summaries = summarization.summarize(content, model=MODEL)
 
     return jsonify(summaries=summaries)
   except Exception as e:
@@ -43,7 +43,7 @@ def shorten():
 
 @app.errorhandler(500)
 def server_error(e):
-    logging.exception('An error occurred during a request.')
+    app.logger.error('An error occurred during a request.')
     return """
     An internal error occurred: <pre>{}</pre>
     See logs for full stacktrace.
@@ -53,15 +53,18 @@ app.register_blueprint(api, url_prefix='/api')
 
 if __name__ == '__main__':
   # Downloads models locally
-  download_models(MODEL_BUCKET)
+  summarization.download_models(MODEL_BUCKET)
 
   # initialize the log handler
-  logHandler = RotatingFileHandler(
-    os.environ.get('ERRORS_LOG_PATH', 'errors.log'), 
-    maxBytes=1000, backupCount=1)
-  logHandler.setLevel(logging.INFO)
-  app.logger.setLevel(logging.INFO)
+  formatter = logging.Formatter(
+      "[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s")
+  file_handler = RotatingFileHandler(os.environ.get('LOG_FILENAME', 'app.log'), maxBytes=10000000, backupCount=5)
+  file_handler.setLevel(logging.DEBUG)
+  file_handler.setFormatter(formatter)
+  app.logger.addHandler(file_handler) 
 
-  app.logger.addHandler(logHandler) 
+  console_handler = logging.StreamHandler()
+  console_handler.setFormatter(formatter)
+  app.logger.addHandler(console_handler)
 
   app.run(debug=True, port=5900, host='0.0.0.0', use_reloader=False)

@@ -3,10 +3,7 @@ from flask import Flask, Blueprint, request, jsonify
 import os
 import logging
 from logging.handlers import RotatingFileHandler
-from dotenv import load_dotenv
 import summarization
-
-load_dotenv()
 
 MODEL_BUCKET = os.environ.get('MODEL_BUCKET', 'breef-models')
 MODEL = None
@@ -19,7 +16,8 @@ api = Blueprint('api', __name__, template_folder='templates')
 def _load_model():
   global MODEL
 
-  MODEL = summarization.load_models()
+  MODEL = summarization.load_models(_logger=app.logger)
+
 
 @api.route('/shorten', methods=['GET', 'POST'])
 def shorten():
@@ -41,6 +39,12 @@ def shorten():
     app.logger.error(e)
     return jsonify(status_code='500', msg='Interval Server Error'), 500
 
+
+@app.route('/env', methods=['GET', 'POST'])
+def environment_variables():
+  return jsonify(environment=dict(os.environ))
+
+
 @app.errorhandler(500)
 def server_error(e):
     app.logger.error('An error occurred during a request.')
@@ -48,6 +52,7 @@ def server_error(e):
     An internal error occurred: <pre>{}</pre>
     See logs for full stacktrace.
     """.format(e), 500
+
 
 app.register_blueprint(api, url_prefix='/api')
 

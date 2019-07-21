@@ -18,7 +18,7 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
 
 MODEL_BUCKET = os.environ.get('MODEL_BUCKET', 'breef-models')
-_logger = logging.getLogger('summarization')
+logger = logging.getLogger()
 
 def preprocess(strs):
     """
@@ -65,7 +65,7 @@ def skipthought_encode(strs, model):
 
     all_sentences = [sent for str in strs for sent in str]
     encoder = Encoder(model)
-    _logger.info('Encoding sentences...')
+    logger.info('Encoding sentences...')
     enc_sentences = encoder.encode(all_sentences, verbose=False)
 
     for i in range(len(strs)):
@@ -85,15 +85,15 @@ def summarize(strs, model=None):
     n_strs = len(strs)
     summaries = [None]*n_strs
 
-    _logger.info('Preprocessing...')
+    logger.info('Preprocessing...')
     preprocess(strs)
 
-    _logger.info('Splitting into sentences...')
+    logger.info('Splitting into sentences...')
     split_sentences(strs)
 
-    _logger.info('Starting to encode...')
+    logger.info('Starting to encode...')
     enc_strs = skipthought_encode(strs, model)
-    _logger.info('Encoding Finished')
+    logger.info('Encoding Finished')
 
     for i in range(n_strs):
         enc_str = enc_strs[i]
@@ -111,12 +111,12 @@ def summarize(strs, model=None):
                                                 enc_str)
         ordering = sorted(range(n_clusters), key=lambda k: avg[k])
         summaries[i] = ' '.join([strs[i][closest[idx]] for idx in ordering])
-    _logger.info('Clustering Finished')
+    logger.info('Clustering Finished')
 
     return summaries
 
 
-def download_models(gs_bucket):
+def download_models(gs_bucket, _logger=logger):
     """ 
     Downloads missing models dependencies, locally, if they don't exist already. 
     """
@@ -144,8 +144,8 @@ def download_models(gs_bucket):
             except Exception as e:
                 _logger.error(e)
 
-def load_models():
-    download_models(MODEL_BUCKET)
+def load_models(_logger=logger):
+    download_models(MODEL_BUCKET, _logger)
 
     _logger.info('Loading pre-trained models...')
     return load_model()

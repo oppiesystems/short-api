@@ -15,3 +15,6 @@ gcloud services enable \
   cloudbuild.googleapis.com \
   containerregistry.googleapis.com \
   iam.googleapis.com
+
+# Configures remote Docker
+gcloud auth configure-docker

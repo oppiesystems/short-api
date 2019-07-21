@@ -66,5 +66,5 @@ target/
 data/
 
 # Models (files only)
-models/*
+models/
 !models/.gitkeep

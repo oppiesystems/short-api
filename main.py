@@ -4,6 +4,7 @@ import os
 import logging
 from logging.handlers import RotatingFileHandler
 import summarization
+import util
 
 MODEL_BUCKET = os.environ.get('MODEL_BUCKET', 'breef-models')
 MODEL = None
@@ -19,22 +20,24 @@ def _load_model():
   MODEL = summarization.load_models(_logger=app.logger)
 
 
-@api.route('/shorten', methods=['GET', 'POST'])
-def shorten():
+@api.route('/digest', methods=['POST'])
+def digest():
   content = {}
   try:
-    strContent = request.args.get('content', type = str)
-    if strContent == None:
-      content = request.get_json()['content']
-    else:
-      content = [strContent]
+    content = request.get_json()['content']
   except Exception:
     return jsonify(status_code='400', msg='Bad Request'), 400
 
   try:
-    summaries = summarization.summarize(content, model=MODEL)
+    digest_list = summarization.summarize([content], model=MODEL)
+    digest = digest_list[0]
 
-    return jsonify(summaries=summaries)
+    return jsonify(
+      digest=digest,
+      inputLength=len(content),
+      outputLength=len(digest),
+      reduction=util.percentage_difference(digest, content)
+    )
   except Exception as e:
     app.logger.error(e)
     return jsonify(status_code='500', msg='Interval Server Error'), 500

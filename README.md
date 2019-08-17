@@ -7,6 +7,12 @@ Text summarization product for distilling human verbosity.
 ### Development Prerequisites
 
 ```bash
+npm run preinstall
+```
+
+*OR*
+
+```bash
 virtualenv .
 source bin/activate
 ```
@@ -35,11 +41,27 @@ python main.py
 
 ### Test
 
+#### Unit Test
+
+Execute the following command to run the unit test package for the project.
+
+```bash
+npm test
+
+--or--
+
+python -m unittest -v test # Verbose
+```
+
+#### API
+
+`POST /digest`
+
 ```bash
 curl --header "Content-Type: application/json" \
   --request POST \
-  -d @test/data.json \
-  http://0.0.0.0:5900/api/shorten
+  -d @test/post_data.json \
+  http://0.0.0.0:5900/api/digest
 ```
 
 ## Deployment

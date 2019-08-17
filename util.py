@@ -11,3 +11,7 @@ def download_blob(bucket_name, source_blob_name, destination_file_name):
   print('Blob {} downloaded to {}.'.format(
       source_blob_name,
       destination_file_name))
+
+def percentage_difference(first_str, second_str):
+  """Calculates the difference in string length as a fractional representation of a percentage."""
+  return (1 - float(len(first_str)) / len(second_str))

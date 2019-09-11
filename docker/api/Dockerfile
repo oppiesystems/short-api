@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-LABEL version="0.2.0" maintainer="Pat Migliaccio <pat@oppie.io>"
+LABEL version="0.3.0" maintainer="Pat Migliaccio <pat@oppie.io>"
 
 RUN apt-get update -y
 RUN apt-get install -y \
@@ -21,8 +21,8 @@ RUN python -c 'import nltk; nltk.download("punkt")'
 COPY . /app
 
 # Mount Google Cloud Storage models
+ARG GCS_MOUNT_ROOT="/mnt/gcsfuse"
 ARG GCSFUSE_REPO="gcsfuse-stretch"
-ARG GCS_MOUNT_ROOT="/app/gcsfuse"
 RUN apt-get install --yes --no-install-recommends \
     ca-certificates \
     curl && \

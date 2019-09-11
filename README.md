@@ -68,7 +68,13 @@ curl --header "Content-Type: application/json" \
 
 ### Local Docker
 
-#### Build and run image
+#### Build image
+
+```bash
+docker build -t breef:latest .
+```
+
+#### Run image
 
 ```bash
 docker-compose up
@@ -93,7 +99,7 @@ gcloud auth configure-docker
 #### Build and deploy GCP image
 
 ```bash
-gcloud builds submit --tag gcr.io/breef-247014/breef-image .
+gcloud builds submit --config cloudbuild.yaml .
 ```
 
 #### Run the GCP Image

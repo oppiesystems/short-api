@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+  api:
+    container_name: short-api
+    image: gcr.io/breef-247014/breef_api
+    privileged: true
+    ports:
+      - "5900:5900"
+    environment:
+      - GCS_MOUNT_ROOT=/mnt/gcsfuse
+      - SKIPTHOUGHTS_MODELS_PATH=/app/models/
+      - SKIPTHOUGHTS_TABLES_PATH=/app/models/
+      - GCS_BUCKET=breef-models
+    restart: always
+    labels:
+      kompose.service.type: LoadBalancer
+      service.spec.externalTrafficPolicy: Local

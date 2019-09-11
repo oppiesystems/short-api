@@ -148,4 +148,7 @@ def load_models(_logger=logger):
     download_models(MODEL_BUCKET, _logger)
 
     _logger.info('Loading pre-trained models...')
-    return load_model()
+    MODEL = load_model()
+    _logger.info('Pre-trained model loaded.')
+
+    return MODEL

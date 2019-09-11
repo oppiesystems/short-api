@@ -1,9 +1,10 @@
 version: '3'
+
 services:
-  app:
-    container_name: breef_app
+  api:
+    container_name: short_api
     build: 
-      context: .
+      context: ./docker/api
       args:
         GCS_MOUNT_ROOT: ${GCS_MOUNT_ROOT}
     privileged: true
@@ -21,4 +22,5 @@ services:
       - SKIPTHOUGHTS_MODELS_PATH=/app/models/
       - SKIPTHOUGHTS_TABLES_PATH=/app/models/
       - GCS_BUCKET=${MODEL_BUCKET}
+    restart: always
     

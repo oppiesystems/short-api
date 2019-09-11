@@ -1,0 +1,10 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/breef_api-image', './docker/api' ]
+  env:
+  - 'GOOGLE_APPLICATION_CREDENTIALS='
+  - 'SKIPTHOUGHTS_MODELS_PATH=/app/models/'
+  - 'SKIPTHOUGHTS_TABLES_PATH=/app/models/'
+  - 'GCS_MOUNT_ROOT=/mnt/gcsfuse'
+images:
+- 'gcr.io/$PROJECT_ID/breef_api-image'

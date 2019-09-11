@@ -1,6 +1,8 @@
 .vscode
 bin
 data/
+test/
+logs/
 
 # Models
 models/

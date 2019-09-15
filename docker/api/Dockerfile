@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-LABEL version="0.2.0" maintainer="Pat Migliaccio <pat@oppie.io>"
+LABEL version="0.3.0" maintainer="Pat Migliaccio <pat@oppie.io>"
 
 RUN apt-get update -y
 RUN apt-get install -y \
@@ -22,7 +22,6 @@ COPY . /app
 
 # Mount Google Cloud Storage models
 ARG GCSFUSE_REPO="gcsfuse-stretch"
-ARG GCS_MOUNT_ROOT="/app/gcsfuse"
 RUN apt-get install --yes --no-install-recommends \
     ca-certificates \
     curl && \
@@ -34,7 +33,9 @@ RUN apt-get update
 RUN apt-get install --yes gcsfuse && \
     echo 'user_allow_other' > /etc/fuse.conf
 
-RUN mkdir --parents $GCS_MOUNT_ROOT
+# ARG GCS_MOUNT_ROOT="/mnt/gcsfuse"
+# RUN mkdir --parents $GCS_MOUNT_ROOT
+# ENV GCS_MOUNT_ROOT GCS_MOUNT_ROOT
 
 # Clean up.
 USER root
@@ -45,8 +46,6 @@ RUN apt-get remove --yes \
 
 # Reference: https://stackoverflow.com/a/34517230/5199198
 ENV PYTHONIOENCODING "UTF-8"
-
-ENV GCS_MOUNT_ROOT GCS_MOUNT_ROOT
 
 COPY entrypoint.sh /entrypoint.sh
 RUN ["chmod", "+x", "/entrypoint.sh" ]

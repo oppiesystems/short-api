@@ -1,8 +1,12 @@
 {
   "scripts": {
     "preinstall": "virtualenv . && source bin/activate && pip install -r requirements.txt && python -c 'import nltk; nltk.download(\"punkt\")'",
-    "build": "docker build -t breef:latest .",
+    "build": "docker build -t breef:latest -f ./docker/api/Dockerfile .",
     "start": "docker-compose up",
+    "deploy": "docker build -t gcr.io/breef-247014/breef_api -f ./docker/api/Dockerfile . && gcloud docker -- push gcr.io/breef-247014/breef_api",
+    "start:cloud": "cd kubernetes && kompose up",
+    "stop:cloud": "cd kubernetes && kompose down",
+    "status": "kubectl get deployment,svc,pods,pvc,ingress",
     "test": "python -m unittest test"
   }
 }

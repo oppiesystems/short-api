@@ -68,7 +68,13 @@ curl --header "Content-Type: application/json" \
 
 ### Local Docker
 
-#### Build and run image
+#### Build image
+
+```bash
+docker build -t breef:latest .
+```
+
+#### Run image
 
 ```bash
 docker-compose up
@@ -93,7 +99,7 @@ gcloud auth configure-docker
 #### Build and deploy GCP image
 
 ```bash
-gcloud builds submit --tag gcr.io/breef-247014/breef-image .
+yarn run deploy
 ```
 
 #### Run the GCP Image
@@ -116,4 +122,10 @@ docker logs -f breef_app
 
 ```bash
 docker exec -t -i breef_app ls models
+```
+
+#### Mount Remote Models Locally
+
+```bash
+sudo mkdir -m 777 -p /mnt/models && gcsfuse --foreground -o nonempty breef-models /mnt/models
 ```

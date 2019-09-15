@@ -26,7 +26,7 @@ def digest():
   try:
     content = request.get_json()['content']
   except Exception:
-    return jsonify(status_code='400', msg='Bad Request'), 400
+    return jsonify(code='400', message='Bad Request'), 400
 
   try:
     digest_list = summarization.summarize([content], model=MODEL)
@@ -39,8 +39,8 @@ def digest():
       reduction=util.percentage_difference(digest, content)
     )
   except Exception as e:
-    app.logger.error(e)
-    return jsonify(status_code='500', msg='Interval Server Error'), 500
+    app.logger.error(e.message)
+    return jsonify(code='500', message='Interval Server Error'), 500
 
 
 @app.route('/env', methods=['GET', 'POST'])

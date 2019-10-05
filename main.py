@@ -17,8 +17,8 @@ api = Blueprint('api', __name__, template_folder='templates')
 def _load_model():
   global MODEL
 
+  # Note: In GKS, health check triggers loading of model
   MODEL = summarization.load_models(_logger=app.logger)
-
 
 @api.route('/digest', methods=['POST'])
 def digest():
@@ -47,6 +47,14 @@ def digest():
 def environment_variables():
   return jsonify(environment=dict(os.environ))
 
+@app.route('/healthz', methods=['GET'])
+def health():
+  """Health check probe route for Kubernetes Ingress"""
+  return jsonify(code='200', message='Ok')
+
+@app.route('/', methods=['GET'])
+def default():
+  return jsonify(code='200', message='Ok')
 
 @app.errorhandler(500)
 def server_error(e):

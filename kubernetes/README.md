@@ -161,7 +161,7 @@ Verify exposed IP
 kubectl get ingress
 ```
 
-### SSL
+### SSL/TLS
 
 Add SSL certificates downloaded from Cloudflare.
 

@@ -1,60 +1,32 @@
 apiVersion: v1
+kind: List
 items:
-- apiVersion: v1
-  kind: Service
-  metadata:
-    annotations:
-      kompose.cmd: kompose convert -o deployment.yml
-      kompose.service.type: LoadBalancer
-      kompose.version: 1.17.0 (a74acad)
-      service.spec.externalTrafficPolicy: Local
-    creationTimestamp: null
-    labels:
-      io.kompose.service: api
-    name: api
-  spec:
-    ports:
-    - name: "5900"
-      port: 5900
-      targetPort: 5900
-    selector:
-      io.kompose.service: api
-    type: LoadBalancer
-  status:
-    loadBalancer: {}
 - apiVersion: extensions/v1beta1
   kind: Deployment
   metadata:
-    annotations:
-      kompose.cmd: kompose convert -o deployment.yml
-      kompose.service.type: LoadBalancer
-      kompose.version: 1.17.0 (a74acad)
-      service.spec.externalTrafficPolicy: Local
-    creationTimestamp: null
-    labels:
-      io.kompose.service: api
-    name: api
+    name: api-deployment
   spec:
+    selector:
+      matchLabels:
+        io.kompose.service: api
     replicas: 1
-    strategy: {}
     template:
       metadata:
-        creationTimestamp: null
         labels:
           io.kompose.service: api
       spec:
         containers:
-        - env:
+        - name: short-api
+          image: gcr.io/breef-247014/breef_api
+          ports:
+          - containerPort: 5900
+          env:
           - name: GCS_BUCKET
             value: breef-models
           - name: SKIPTHOUGHTS_MODELS_PATH
             value: /mnt/disk/models/
           - name: SKIPTHOUGHTS_TABLES_PATH
             value: /mnt/disk/models/
-          image: gcr.io/breef-247014/breef_api
-          name: short-api
-          ports:
-          - containerPort: 5900
           volumeMounts:
           - mountPath: "/mnt/disk"
             name: short-disk
@@ -70,12 +42,27 @@ items:
             capabilities:
               add:
                 - SYS_ADMIN
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5900
         volumes:
         - name: short-disk
           persistentVolumeClaim:
             claimName: short-disk
         restartPolicy: Always
   status: {}
-kind: List
-metadata: {}
-
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: api
+    labels:
+      io.kompose.service: api
+  spec:
+    type: NodePort
+    selector:
+      io.kompose.service: api
+    ports:
+    - name: "5900"
+      port: 5900
+      targetPort: 5900

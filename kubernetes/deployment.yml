@@ -48,26 +48,32 @@ items:
           - name: GCS_BUCKET
             value: breef-models
           - name: SKIPTHOUGHTS_MODELS_PATH
-            value: /mnt/models/
+            value: /mnt/disk/models/
           - name: SKIPTHOUGHTS_TABLES_PATH
-            value: /mnt/models/
+            value: /mnt/disk/models/
           image: gcr.io/breef-247014/breef_api
           name: short-api
           ports:
           - containerPort: 5900
-          resources: {}
+          volumeMounts:
+          - mountPath: "/mnt/disk"
+            name: short-disk
+          resources: 
+            requests:
+              memory: "8096Mi"
+              cpu: "500m"
+            limits:
+              memory: "16384Mi"
+              cpu: "1000m"
           securityContext:
             privileged: true
             capabilities:
               add:
                 - SYS_ADMIN
-          lifecycle:
-            postStart:
-              exec:
-                command: ["bash", "./poststart_install.sh"]
-            preStop:
-              exec:
-                command: ["fusermount", "-u", "/mnt/models"]
+        volumes:
+        - name: short-disk
+          persistentVolumeClaim:
+            claimName: short-disk
         restartPolicy: Always
   status: {}
 kind: List

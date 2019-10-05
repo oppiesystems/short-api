@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM nvidia/cuda:9.0-cudnn7-runtime
 
 LABEL version="0.3.0" maintainer="Pat Migliaccio <pat@oppie.io>"
 
@@ -32,10 +32,6 @@ RUN apt-get install --yes --no-install-recommends \
 RUN apt-get update
 RUN apt-get install --yes gcsfuse && \
     echo 'user_allow_other' > /etc/fuse.conf
-
-# ARG GCS_MOUNT_ROOT="/mnt/gcsfuse"
-# RUN mkdir --parents $GCS_MOUNT_ROOT
-# ENV GCS_MOUNT_ROOT GCS_MOUNT_ROOT
 
 # Clean up.
 USER root

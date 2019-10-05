@@ -1,0 +1,17 @@
+# Publicly exposes application
+---
+apiVersion: "extensions/v1beta1"
+kind: "Ingress"
+metadata:
+  name: "ingress"
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "short-dev-ip"
+    ingress.gcp.kubernetes.io/pre-shared-cert: "ingress"
+spec:
+  rules:
+    - http:
+        paths:
+        - path: /*
+          backend:
+            serviceName: "api"
+            servicePort: 5900

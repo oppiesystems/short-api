@@ -75,4 +75,4 @@ if __name__ == '__main__':
   console_handler.setFormatter(formatter)
   app.logger.addHandler(console_handler)
 
-  app.run(debug=True, port=5900, host='0.0.0.0', use_reloader=False)
+  app.run(debug=True, port=int(os.environ.get('PORT', 5900)), host='0.0.0.0', use_reloader=False)

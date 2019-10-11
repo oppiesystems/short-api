@@ -1,6 +1,6 @@
-# breef
+# short-api
 
-Text summarization product for distilling human verbosity.
+Domain-specific content summarization API.
 
 ## Development
 
@@ -10,7 +10,7 @@ Text summarization product for distilling human verbosity.
 npm run preinstall
 ```
 
-*OR*
+--or--
 
 ```bash
 virtualenv .
@@ -34,6 +34,12 @@ wget -P ./models http://www.cs.toronto.edu/~rkiros/models/dictionary.txt
 ```
 
 ### Run
+
+```bash
+npm start
+```
+
+--or--
 
 ```bash
 python main.py

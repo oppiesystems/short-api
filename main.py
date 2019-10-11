@@ -25,6 +25,10 @@ def digest():
   content = {}
   try:
     content = request.get_json()['content']
+    
+    if len(content) < 100:
+      return jsonify(code='400', message='Bad Request - Minimum content length of 100 characters not met.'), 400
+
   except Exception:
     return jsonify(code='400', message='Bad Request'), 400
 

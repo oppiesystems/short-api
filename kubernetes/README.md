@@ -173,36 +173,59 @@ gcloud compute ssl-certificates create ingress  \
 kubectl apply -f ingress-service.yml
 ```
 
-## Upgrade Resource Pool
+## Resource Pools
+
+### Upgrade Resources
 
 Use the [console](https://console.cloud.google.com/kubernetes/clusters/) or via the command-line interface:
 
-Create a larger pool with more memory.
+Create a pool with a specified `machine-type` and cluster size.
 
 ```bash
-gcloud container node-pools create larger-pool \
+gcloud container node-pools create medium-pool \
   --cluster=short-dev \
-  --machine-type=n1-highmem-8 \
-  --num-nodes=3
+  --machine-type=n1-highmem-2 \
+  --num-nodes 1 --enable-autoscaling
+  --min-nodes 1 --max-nodes 3
 ```
 
-Cordon (or unschedule) nodes in existing pool
+#### Cordon
+
+Cordon (or unschedule) nodes in existing pool, where `larger-pool` is the name of the node pool.
 
 ```bash
-for node in $(kubectl get nodes -l cloud.google.com/gke-nodepool=default-pool -o=name); do
+for node in $(kubectl get nodes -l cloud.google.com/gke-nodepool=larger-pool -o=name); do
   kubectl cordon "$node";
 done
 ```
 
-Drain (or evict) nodes in existing pool
+#### Evict
+
+Drain (or evict) nodes in existing pool, where `larger-pool` is the name of the node pool.
 
 ```bash
-for node in $(kubectl get nodes -l cloud.google.com/gke-nodepool=default-pool -o=name); do
+for node in $(kubectl get nodes -l cloud.google.com/gke-nodepool=larger-pool -o=name); do
   kubectl drain --force --ignore-daemonsets --delete-local-data --grace-period=10 "$node";
 done
 ```
 
 __Note__: A GPU can be used with a `nvidia-tesla-t4` machine type.
+
+### Examine Pool
+
+```bash
+gcloud container node-pools describe larger-pool \
+    --cluster short-dev
+```
+
+### Delete Pool
+
+__Note__: Cordon and evict node resources prior to deleteing pool.
+
+```bash
+gcloud container node-pools delete larger-pool \
+    --cluster short-dev
+```
 
 ## Debug
 
